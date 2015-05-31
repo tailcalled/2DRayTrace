@@ -48,15 +48,50 @@ case class XAxis(color: Color) extends WorldPiece {
 }
 
 
-/*case class Rotated(piece: WorldPiece, by: Angle) extends WorldPiece {
+case class Rotated(piece: WorldPiece, by: Angle) extends WorldPiece {
 	def transform(ray: Ray) = {
 		import math._
 		val rayPLen = hypot(ray.point.x, ray.point.y)
-		val rayPDir =
-			if (rayPLen < 0.000001) 0.0
-			else atan2(ray.point.x / rayPLen, ray.point.x / rayPLen)
-
+		val rayPDir = atan2(ray.point.y, ray.point.x)
+		val tx = cos(rayPDir + by.theta) * rayPLen
+		val ty = sin(rayPDir + by.theta) * rayPLen
+		Ray(Point(ray.point.world, tx, ty), ray.angle + by)
+	}
+	def untransform(ray: Ray) = {
+		import math._
+		val rayPLen = hypot(ray.point.x, ray.point.y)
+		val rayPDir = atan2(ray.point.y, ray.point.x)
+		val tx = cos(rayPDir - by.theta) * rayPLen
+		val ty = sin(rayPDir - by.theta) * rayPLen
+		Ray(Point(ray.point.world, tx, ty), ray.angle - by)
 	}
 	def dist(ray: Ray) = {
+		piece.dist(transform(ray))
 	}
-}*/
+	def reflect(ray: Ray) = {
+		piece.reflect(transform(ray)) match {
+			case None => None
+			case Some(Left((ray2, f))) => Some(Left((untransform(ray2), f)))
+			case Some(Right(x)) => Some(Right(x))
+		}
+	}
+}
+
+case class Translated(piece: WorldPiece, by: (Double, Double)) extends WorldPiece {
+	def transform(ray: Ray) = {
+		Ray(Point(ray.point.world, ray.point.x - by._1, ray.point.y - by._2), ray.angle)
+	}
+	def untransform(ray: Ray) = {
+		Ray(Point(ray.point.world, ray.point.x + by._1, ray.point.y + by._2), ray.angle)
+	}
+	def dist(ray: Ray) = {
+		piece.dist(transform(ray))
+	}
+	def reflect(ray: Ray) = {
+		piece.reflect(transform(ray)) match {
+			case None => None
+			case Some(Left((ray2, f))) => Some(Left((untransform(ray2), f)))
+			case Some(Right(x)) => Some(Right(x))
+		}
+	}
+}
