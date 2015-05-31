@@ -17,7 +17,7 @@ object Test extends Engine {
 		if (pressed contains Keys.Up) y -= 4
 		if (pressed contains Keys.Down) y += 4
 		val nRays = 10000
-		val rays = (0 until nRays).map(ray => Ray(Point(world, x, y), ray * Pi * 2 / nRays)).toArray
+		val rays = (0 until nRays).map(ray => Ray(Point(world, x, y), Angle(ray * Pi * 2 / nRays))).toArray
 		val ress = rays.map(_.next)
 		for (i <- 0 until nRays) {
 			val j = (i + 1) % nRays
