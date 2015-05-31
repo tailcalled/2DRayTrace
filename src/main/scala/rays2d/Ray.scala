@@ -8,19 +8,22 @@ trait WorldPiece {
 
 case class Point(world: World, x: Double, y: Double)
 case class Ray(point: Point, angle: Angle) {
-	def next: Option[(Either[(Ray, Color => Color),Color],Double)] = {
+	def next: Option[(Ray, Option[Color] => Color,Double)] = {
 		val x = point.world.objs.flatMap(x => x.dist(this).map(y => (y,x)))
 		if (x.isEmpty) {
 			None
 		}
 		else {
 			val (dist, obj) = x.minBy(_._1)
-			Some((obj.reflect(this).get, dist))
+			val (ray, c) = obj.reflect(this).get
+			Some((ray, c, dist))
 		}
 	}
 }
+object EmptyWorld extends World(Vector())
+object NullRay extends Ray(Point(EmptyWorld, 0, 0), Angle(0))
 
-case class XAxis(color: Color) extends WorldPiece {
+case class XAxis(color: Option[Color] => Color) extends WorldPiece {
 	def dist(ray: Ray): Option[Double] = {
 		if (ray.point.x == 0) {
 			None
@@ -37,7 +40,7 @@ case class XAxis(color: Color) extends WorldPiece {
 			else Some(math.hypot(b, b*math.tan(ray.angle.theta - 0.5*math.Pi)))
 		}
 	}
-	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]] = {
+	def reflect(rayr Ray): Option[(Ray, Option[Color] => Color)] = {
 		if (ray.point.x == 0) {
 			None
 		}
@@ -45,10 +48,10 @@ case class XAxis(color: Color) extends WorldPiece {
 			val b = ray.point.y
 			if (b > 0) {
 				if (ray.angle.theta <= math.Pi) None
-				else Some(Right(color))
+				else Some((Angle(2*math.pi - ray.angle.theta), color))
 			}
 			else if (ray.angle.theta >= math.Pi) None
-			else Some(Right(color))
+			else Some((Angle(2*math.pi + ray.angle.theta), color))
 		}
 	}
 }
@@ -66,7 +69,7 @@ case class Circle(color: Color, radius: Double) extends WorldPiece {
 		val x = p*math.cos(phi.theta) + sgn * math.sqrt(radius*radius - p*p*sintheta*sintheta)
 		return Some(-x)
 	}
-	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]] = {
+	def reflect(ray: Ray): Option[(Ray, Option[Color] => Color)] = {
 		val p = math.hypot(ray.point.x, ray.point.y)
 		val maxAngleDeviation = Angle(math.asin(radius / p))
 		val angleToCenter = Angle(math.atan2(ray.point.y, ray.point.x))
