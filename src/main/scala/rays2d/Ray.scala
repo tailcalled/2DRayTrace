@@ -38,7 +38,7 @@ case class XAxis(color: Color) extends WorldPiece {
 			return None
 		}
 		val b = ray.point.y
-		if (ray.point.x > 0) {
+		if (b > 0) {
 			if (ray.angle.theta <= math.Pi) return None
 			return Some(Right(color))
 		}

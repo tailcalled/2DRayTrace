@@ -4,18 +4,18 @@ object Test extends Engine {
 
 	def title = "2D raytracing test"
 
-	var x = 10.0
-	var y = 10.0
+	var x = 110.0
+	var y = 110.0
 
-	val world = World(Vector(XAxis(null)))
+	val world = World(Vector(Translated(XAxis(null), (100, 100))))
 
 	def step() = {
 		import Keys._
 		import math._
-		if (pressed contains Keys.Left) x -= 0.5
-		if (pressed contains Keys.Right) x += 0.5
-		if (pressed contains Keys.Up) y -= 0.5
-		if (pressed contains Keys.Down) y += 0.5
+		if (pressed contains Keys.Left) x -= 4
+		if (pressed contains Keys.Right) x += 4
+		if (pressed contains Keys.Up) y -= 4
+		if (pressed contains Keys.Down) y += 4
 		val nRays = 10000
 		val rays = (0 until nRays).map(ray => Ray(Point(world, x, y), Angle(ray * Pi * 2 / nRays))).toArray
 		val ress = rays.map(_.next)
