@@ -1,5 +1,5 @@
-package 2drays
+package rays2d
 
 object World {
-	
+
 }
