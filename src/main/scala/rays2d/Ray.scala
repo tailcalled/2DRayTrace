@@ -60,8 +60,9 @@ case class Circle(color: Color, radius: Double) extends WorldPiece {
 		val angleToCenter = Angle(math.atan2(ray.point.y, ray.point.x))
 		if (ray.angle.inInterval(angleToCenter - maxAngleDeviation, angleToCenter + maxAngleDeviation))
 			return None
-		val sintheta = math.sin(ray.angle.theta)
-		val x = p*math.cos(ray.angle.theta) - math.sqrt(radius*radius - p*p*sintheta*sintheta)
+		val phi = ray.angle - angleToCenter
+		val sintheta = math.sin(phi.theta)
+		val x = p*math.cos(phi.theta) - math.sqrt(radius*radius - p*p*sintheta*sintheta)
 		return Some(x)
 	}
 	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]] = {
