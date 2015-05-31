@@ -4,10 +4,10 @@ object Test extends Engine {
 
 	def title = "2D raytracing test"
 
-	var x = 100.0
-	var y = 100.0
+	var x = 110.0
+	var y = 110.0
 
-	val world = World(Vector())
+	val world = World(Vector(Translated(XAxis(null), (100, 100))))
 
 	def step() = {
 		import Keys._

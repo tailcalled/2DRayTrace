@@ -13,5 +13,7 @@ object Angle {
 		else theta
 	}
 }
-class Angle private(val theta: Double) extends AnyVal
-
+class Angle private(val theta: Double) extends AnyVal {
+	def +(that: Angle) = Angle(this.theta + that.theta)
+	def -(that: Angle) = Angle(this.theta - that.theta)
+}
