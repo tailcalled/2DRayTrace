@@ -24,14 +24,14 @@ case class XAxis(color: Color) extends WorldPiece {
 			return None
 		}
 		val b = ray.point.y
-		if (ray.point.x > 0) {
+		if (b > 0) {
 			if (ray.angle.theta <= math.Pi) return None
 			if (ray.angle.theta < 1.5 * math.Pi) return Some(math.hypot(b, b*math.tan(1.5*math.Pi - ray.angle.theta)))
 			return Some(math.hypot(b, b*math.tan(ray.angle.theta - 1.5 * math.Pi)))
 		}
 		if (ray.angle.theta >= math.Pi) return None
-		if (ray.angle.theta < 0.5 * math.Pi) return Some(math.hypot(-b, -b*math.tan(0.5*math.Pi - ray.angle.theta)))
-		return Some(math.hypot(-b, -b*math.tan(ray.angle.theta - 0.5*math.Pi)))
+		if (ray.angle.theta < 0.5 * math.Pi) return Some(math.hypot(b, b*math.tan(0.5*math.Pi - ray.angle.theta)))
+		return Some(math.hypot(b, b*math.tan(ray.angle.theta - 0.5*math.Pi)))
 	}
 	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]] = {
 		if (ray.point.x == 0) {
@@ -46,4 +46,5 @@ case class XAxis(color: Color) extends WorldPiece {
 		return Some(Right(color))
 	}
 }
+
 
