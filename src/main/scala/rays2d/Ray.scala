@@ -55,22 +55,22 @@ case class XAxis(color: Color) extends WorldPiece {
 
 case class Circle(color: Color, radius: Double) extends WorldPiece {
 	def dist(ray: Ray): Option[Double] = {
-		val p = math.hypot(ray.point.x, ray.point,y)
-		val maxAngleDeviation = math.asin(r / p)
-		val angleToCenter = math.atan2(ray.point.y, ray.point.x)
-		if (ray.angle > angle_to_center + max_angle_deviation || ray.angle < angle_to_center - max_angle_deviation)
+		val p = math.hypot(ray.point.x, ray.point.y)
+		val maxAngleDeviation = Angle(math.asin(radius / p))
+		val angleToCenter = Angle(math.atan2(ray.point.y, ray.point.x))
+		if (ray.angle.inInterval(angleToCenter - maxAngleDeviation, angleToCenter + maxAngleDeviation))
 			return None
 		val sintheta = math.sin(ray.angle.theta)
-		val x = p*math.cos(ray.angle.theta) - math.sqrt(r*r - p*p*sintheta*sintheta)
+		val x = p*math.cos(ray.angle.theta) - math.sqrt(radius*radius - p*p*sintheta*sintheta)
 		return Some(x)
 	}
 	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]] = {
-		val p = math.hypot(ray.point.x, ray.point,y)
-		val maxAngleDeviation = math.asin(r / p)
-		val angleToCenter = math.atan2(ray.point.y, ray.point.x)
-		if (ray.angle > angle_to_center + max_angle_deviation || ray.angle < angle_to_center - max_angle_deviation)
+		val p = math.hypot(ray.point.x, ray.point.y)
+		val maxAngleDeviation = Angle(math.asin(radius / p))
+		val angleToCenter = Angle(math.atan2(ray.point.y, ray.point.x))
+		if (ray.angle.inInterval(angleToCenter - maxAngleDeviation, angleToCenter + maxAngleDeviation))
 			return None
-		return Some(color)
+		return Some(Right(color))
 	}
 }
 
