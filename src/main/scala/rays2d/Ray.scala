@@ -18,3 +18,16 @@ case class Ray(point: Point, dir: Double) {
 }
 
 
+
+/*case class Rotated(piece: WorldPiece, by: Angle) extends WorldPiece {
+	def transform(ray: Ray) = {
+		import math._
+		val rayPLen = hypot(ray.point.x, ray.point.y)
+		val rayPDir =
+			if (rayPLen < 0.000001) 0.0
+			else atan2(ray.point.x / rayPLen, ray.point.x / rayPLen)
+
+	}
+	def dist(ray: Ray) = {
+	}
+}*/

@@ -11,5 +11,7 @@ object Angle {
 		else theta
 	}
 }
-case class Angle(theta: Double) extends AnyVal
+case class Angle(theta: Double) extends AnyVal {
+	def +(that: Angle) = Angle(this.theta + that.theta)
+}
 
