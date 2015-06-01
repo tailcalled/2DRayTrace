@@ -88,6 +88,16 @@ case class Circle(color: Option[Color] => Color, radius: Double) extends WorldPi
 	}
 }
 
+case class NoReflect(color: Ray => Color, wp: WorldPiece) extends WorldPiece {
+	def dist(ray: Ray): Option[Double] = wp.dist(ray)
+	def reflect(ray: Ray): Option[(Ray, Option[Color] => Color)] = {
+		wp.reflect(ray) match {
+			case None => None
+			case Some(_) => Some(NullRay, x => color(ray))
+		}
+	}
+}
+
 case class Rotated(piece: WorldPiece, by: Angle) extends WorldPiece {
 	def transform(ray: Ray) = {
 		import math._
