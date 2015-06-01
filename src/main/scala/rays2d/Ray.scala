@@ -3,7 +3,7 @@ package rays2d
 case class World(objs: Vector[WorldPiece])
 trait WorldPiece {
 	def dist(ray: Ray): Option[Double]
-	def reflect(ray: Ray): Option[Either[(Ray, Color => Color),Color]]
+	def reflect(ray: Ray): Option[(Ray, Option[Color] => Color)]
 }
 
 case class Point(world: World, x: Double, y: Double)
@@ -40,18 +40,27 @@ case class XAxis(color: Option[Color] => Color) extends WorldPiece {
 			else Some(math.hypot(b, b*math.tan(ray.angle.theta - 0.5*math.Pi)))
 		}
 	}
-	def reflect(rayr Ray): Option[(Ray, Option[Color] => Color)] = {
+	def reflect(ray: Ray): Option[(Ray, Option[Color] => Color)] = {
 		if (ray.point.x == 0) {
 			None
 		}
 		else {
 			val b = ray.point.y
+			val ix = if (ray.angle.theta == 0.5*math.Pi || ray.angle.theta == 1.5*math.Pi) {
+				ray.point.x
+			} else {
+				val dx = math.cos(ray.angle.theta)
+				val dy = math.sin(ray.angle.theta)
+				val la = dy / dx
+				val lb = ray.point.y - la * ray.point.x
+				lb / la
+			}
 			if (b > 0) {
 				if (ray.angle.theta <= math.Pi) None
-				else Some((Angle(2*math.pi - ray.angle.theta), color))
+				else Some((Ray(Point(ray.point.world, ix, 0), Angle(2*math.Pi - ray.angle.theta)), color))
 			}
 			else if (ray.angle.theta >= math.Pi) None
-			else Some((Angle(2*math.pi - ray.angle.theta), color))
+			else Some((Ray(Point(ray.point.world, ix, 0), Angle(2*math.Pi - ray.angle.theta)), color))
 		}
 	}
 }
@@ -81,10 +90,10 @@ case class Circle(color: Option[Color] => Color, radius: Double) extends WorldPi
 		val dx = -p*math.cos(phi.theta) + sgn * math.sqrt(radius*radius - p*p*sintheta*sintheta)
 		val c = ray.point.x + dx*math.cos(ray.angle.theta)
 		val d = ray.point.y + dx*math.sin(ray.angle.theta)
-		val x2 = d / x * (ray.point.y + c*c - d*d)
-		val b = math.atan(d - y, c - x2)
+		val x2 = d / ray.point.x * (ray.point.y + c*c - d*d)
+		val b = math.atan2(d - ray.point.y, c - x2)
 		val a = b - ray.angle.theta
-		return Some((Angle(a+b), color))
+		return Some((Ray(Point(ray.point.world, c, d), Angle(a+b)), color))
 	}
 }
 
@@ -121,8 +130,7 @@ case class Rotated(piece: WorldPiece, by: Angle) extends WorldPiece {
 	def reflect(ray: Ray) = {
 		piece.reflect(transform(ray)) match {
 			case None => None
-			case Some(Left((ray2, f))) => Some(Left((untransform(ray2), f)))
-			case Some(Right(x)) => Some(Right(x))
+			case Some((ray, col)) => Some((untransform(ray), col))
 		}
 	}
 }
@@ -140,8 +148,7 @@ case class Translated(piece: WorldPiece, by: (Double, Double)) extends WorldPiec
 	def reflect(ray: Ray) = {
 		piece.reflect(transform(ray)) match {
 			case None => None
-			case Some(Left((ray2, f))) => Some(Left((untransform(ray2), f)))
-			case Some(Right(x)) => Some(Right(x))
+			case Some((ray, col)) => Some((untransform(ray),col))
 		}
 	}
 }

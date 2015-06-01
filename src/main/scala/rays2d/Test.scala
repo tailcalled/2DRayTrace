@@ -8,14 +8,14 @@ object Test extends Engine {
 	var y = 110.0
 
 	def world = World(Vector(
-		Translated(XAxis(null), (0, 50)),
-		Translated(XAxis(null), (0, height - 50)),
-		Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (50, 0)),
-		Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (width - 50, 0)),
-		Translated(Rotated(Circle(null, 50), Angle(math.Pi / 4)), (500, 500)),
-		Translated(Circle(null, 50), (50, 50)),
-		Translated(Circle(null, 50), (500, 50)),
-		Translated(Circle(null, 50), (700, 700))
+		NoReflect(_ => null, Translated(XAxis(null), (0, 50))),
+		NoReflect(_ => null, Translated(XAxis(null), (0, height - 50))),
+		NoReflect(_ => null, Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (50, 0))),
+		NoReflect(_ => null, Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (width - 50, 0))),
+		NoReflect(_ => null, Translated(Rotated(Circle(null, 50), Angle(math.Pi / 4)), (500, 500))),
+		NoReflect(_ => null, Translated(Circle(null, 50), (50, 50))),
+		NoReflect(_ => null, Translated(Circle(null, 50), (500, 50))),
+		NoReflect(_ => null, Translated(Circle(null, 50), (700, 700)))
 	))
 
 	def step() = {
