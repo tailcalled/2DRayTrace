@@ -51,12 +51,12 @@ case class XAxis(color: Option[Color] => Color) extends WorldPiece {
 				else Some((Angle(2*math.pi - ray.angle.theta), color))
 			}
 			else if (ray.angle.theta >= math.Pi) None
-			else Some((Angle(2*math.pi + ray.angle.theta), color))
+			else Some((Angle(2*math.pi - ray.angle.theta), color))
 		}
 	}
 }
 
-case class Circle(color: Color, radius: Double) extends WorldPiece {
+case class Circle(color: Option[Color] => Color, radius: Double) extends WorldPiece {
 	def dist(ray: Ray): Option[Double] = {
 		val p = math.hypot(ray.point.x, ray.point.y)
 		val maxAngleDeviation = Angle(math.asin(radius / p))
@@ -75,7 +75,16 @@ case class Circle(color: Color, radius: Double) extends WorldPiece {
 		val angleToCenter = Angle(math.atan2(ray.point.y, ray.point.x))
 		if (ray.angle.inInterval(angleToCenter - maxAngleDeviation, angleToCenter + maxAngleDeviation))
 			return None
-		return Some(Right(color))
+		val phi = ray.angle - angleToCenter
+		val sintheta = math.sin(phi.theta)
+		val sgn = if (p > radius) -1 else 1
+		val dx = -p*math.cos(phi.theta) + sgn * math.sqrt(radius*radius - p*p*sintheta*sintheta)
+		val c = ray.point.x + dx*math.cos(ray.angle.theta)
+		val d = ray.point.y + dx*math.sin(ray.angle.theta)
+		val x2 = d / x * (ray.point.y + c*c - d*d)
+		val b = math.atan(d - y, c - x2)
+		val a = b - ray.angle.theta
+		return Some((Angle(a+b), color))
 	}
 }
 
