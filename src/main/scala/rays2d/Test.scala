@@ -31,7 +31,7 @@ object Test extends Engine {
 		for (i <- 0 until nRays) {
 			val j = (i + 1) % nRays
 			(ress(i), ress(j)) match {
-				case (Some((_, di1)), Some((_, dj1))) =>
+				case (Some((_, _, di1)), Some((_, _, dj1))) =>
 					val di = if (di1 > 500) 500 else di1
 					val dj = if (dj1 > 500) 500 else dj1
 					val ti = i * Pi * 2 / nRays
@@ -40,7 +40,7 @@ object Test extends Engine {
 						val k2 = i + i + 1
 						val tk = k2 * Pi / nRays
 						Ray(Point(world, x, y), Angle(k2 * Pi / nRays)).next match {
-							case Some((_, dk1)) =>
+							case Some((_,_, dk1)) =>
 								val dk = if (dk1 > 500) 500 else dk1
 								drawLine((x + cos(ti) * di, y + sin(ti) * di), (x + cos(tk) * dk, y + sin(tk) * dk), Color(0, 0, 0))
 								drawLine((x + cos(tk) * dk, y + sin(tk) * dk), (x + cos(tj) * dj, y + sin(tj) * dj), Color(0, 0, 0))
