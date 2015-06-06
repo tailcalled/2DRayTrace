@@ -1,5 +1,7 @@
 package rays2d
 
+import scala.collection.mutable.Stack
+
 case class World(objs: Vector[WorldPiece])
 trait WorldPiece {
 	def dist(ray: Ray): Option[Double]
@@ -8,7 +10,7 @@ trait WorldPiece {
 
 case class Point(world: World, x: Double, y: Double)
 case class Ray(point: Point, angle: Angle) {
-	def next: Option[(Ray, Option[Color] => Color,Double)] = {
+	def next: Option[(Ray, Option[Color] => Color, Double)] = {
 		val x = point.world.objs.flatMap(x => x.dist(this).map(y => (y,x)))
 		if (x.isEmpty) {
 			None
@@ -17,6 +19,31 @@ case class Ray(point: Point, angle: Angle) {
 			val (dist, obj) = x.minBy(_._1)
 			val (ray, c) = obj.reflect(this).get
 			Some((ray, c, dist))
+		}
+	}
+	def trace(maxIterations: Int) : Option[(Color, Double)] = {
+		var ray: Ray = this
+		var dist: Double = 0
+		var colorFunction: Option[Color] => Option[Color] = x => None
+		var iteration = 0
+		while (maxIterations > iteration) {
+			iteration = iteration + 1
+			ray.next match {
+				case Some((nray, cfunc, d)) => {
+					ray = nray
+					dist = dist + d
+					val currentColorFunction = colorFunction
+					colorFunction = c => Some(cfunc(currentColorFunction(c)))
+				}
+				case _ => return colorFunction(None) match {
+					case Some(col) => Some((col, dist))
+					case None => None
+				}
+			}
+		}
+		return colorFunction(None) match {
+			case Some(col) => Some((col, dist))
+			case None => None
 		}
 	}
 }

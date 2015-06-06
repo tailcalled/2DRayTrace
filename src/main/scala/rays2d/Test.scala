@@ -7,15 +7,19 @@ object Test extends Engine {
 	var x = 110.0
 	var y = 110.0
 
+	val blackFunc: Option[Color] => Color = x => black
+	val blackFuncRay: Ray => Color = x => black
+	val black = Color(0,0,0)
+
 	def world = World(Vector(
-		NoReflect(_ => null, Translated(XAxis(null), (0, 50))),
-		NoReflect(_ => null, Translated(XAxis(null), (0, height - 50))),
-		NoReflect(_ => null, Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (50, 0))),
-		NoReflect(_ => null, Translated(Rotated(XAxis(null), Angle(math.Pi / 2)), (width - 50, 0))),
-		NoReflect(_ => null, Translated(Rotated(Circle(null, 50), Angle(math.Pi / 4)), (500, 500))),
-		NoReflect(_ => null, Translated(Circle(null, 50), (50, 50))),
-		NoReflect(_ => null, Translated(Circle(null, 50), (500, 50))),
-		NoReflect(_ => null, Translated(Circle(null, 50), (700, 700)))
+		NoReflect(blackFuncRay, Translated(XAxis(blackFunc), (0, 50))),
+		NoReflect(blackFuncRay, Translated(XAxis(blackFunc), (0, height - 50))),
+		NoReflect(blackFuncRay, Translated(Rotated(XAxis(blackFunc), Angle(math.Pi / 2)), (50, 0))),
+		NoReflect(blackFuncRay, Translated(Rotated(XAxis(blackFunc), Angle(math.Pi / 2)), (width - 50, 0))),
+		NoReflect(blackFuncRay, Translated(Rotated(Circle(blackFunc, 50), Angle(math.Pi / 4)), (500, 500))),
+		NoReflect(blackFuncRay, Translated(Circle(blackFunc, 50), (50, 50))),
+		NoReflect(blackFuncRay, Translated(Circle(blackFunc, 50), (700, 700))),
+		NoReflect(blackFuncRay, Translated(Circle(blackFunc, 50), (500, 50)))
 	))
 
 	def step() = {
@@ -27,11 +31,11 @@ object Test extends Engine {
 		if (pressed contains Keys.Down) y += 4
 		val nRays = 200
 		val rays = (0 until nRays).map(ray => Ray(Point(world, x, y), Angle(ray * Pi * 2 / nRays))).toArray
-		val ress = rays.map(_.next)
+		val ress = rays.map(_.trace(5))
 		for (i <- 0 until nRays) {
 			val j = (i + 1) % nRays
 			(ress(i), ress(j)) match {
-				case (Some((_, _, di1)), Some((_, _, dj1))) =>
+				case (Some((_, di1)), Some((_, dj1))) =>
 					val di = if (di1 > 500) 500 else di1
 					val dj = if (dj1 > 500) 500 else dj1
 					val ti = i * Pi * 2 / nRays
